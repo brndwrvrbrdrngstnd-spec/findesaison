@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brandweerfuif — Inschrijving</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #F7F4EE;
+      --surface:   #FFFFFF;
+      --ink:       #1A1A18;
+      --ink-muted: #6B6A65;
+      --accent:    #C0392B;
+      --accent-lt: #FADBD8;
+      --accent-dk: #922B21;
+      --warn:      #B5451B;
+      --warn-lt:   #FAECE7;
+      --border:    rgba(26,26,24,0.12);
+      --radius:    14px;
+      --shadow:    0 2px 16px rgba(0,0,0,0.07);
+    }
+    html { background: var(--bg); }
+    body { font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; overflow-x: hidden; }
+
+    /* ── HEADER ── */
+    .header { text-align: center; margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
+    .header-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
+    .header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 6vw, 2.8rem); color: var(--accent-dk); line-height: 1.1; margin-bottom: 0.4rem; }
+    .header p { font-size: 0.95rem; color: var(--ink-muted); }
+
+    /* ── CARD ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; width: 100%; max-width: 500px; animation: fadeUp 0.5s 0.1s ease both; position: relative; z-index: 1; }
+    .section-label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.75rem; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; }
+    input[type="text"], input[type="email"] { width: 100%; padding: 0.65rem 0.9rem; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--bg); outline: none; transition: border-color 0.15s; }
+    input:focus { border-color: var(--accent); background: #fff; }
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+    /* ── AANTAL PERSONEN ── */
+    .aantal-wrap { display: flex; align-items: center; gap: 12px; }
+    .btn-aantal { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: inherit; }
+    .btn-aantal:hover { background: var(--accent-lt); border-color: var(--accent); }
+    .aantal-getal { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent-dk); min-width: 32px; text-align: center; }
+
+    /* ── BURGER SECTIE ── */
+    .burger-tijd { background: var(--bg); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border); }
+    .burger-tijd-titel { font-size: 0.85rem; font-weight: 500; color: var(--ink); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
+    .burger-rij { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+    .burger-rij:not(:last-child) { border-bottom: 0.5px solid var(--border); }
+    .burger-naam { font-size: 0.875rem; color: var(--ink); flex: 1; }
+    .burger-prijs { font-size: 0.8rem; color: var(--ink-muted); margin-right: 12px; }
+    .burger-controls { display: flex; align-items: center; gap: 8px; }
+    .btn-burger { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: inherit; }
+    .btn-burger:hover { background: var(--accent-lt); border-color: var(--accent); }
+    .burger-count { font-size: 0.9rem; font-weight: 500; min-width: 20px; text-align: center; }
+
+    /* ── TOTAAL ── */
+    .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .total-label { font-size: 0.9rem; color: var(--ink-muted); }
+    .total-amount { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent-dk); }
+    .total-gratis { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #27ae60; }
+
+    /* ── BETAALKNOP ── */
+    #payment-element { margin-bottom: 1.25rem; }
+    #card-errors { color: var(--warn); font-size: 0.8rem; margin-top: 0.4rem; min-height: 1.2em; }
+    .btn-pay { width: 100%; padding: 0.9rem; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-pay:hover:not(:disabled) { background: var(--accent-dk); }
+    .btn-pay:active:not(:disabled) { transform: scale(0.98); }
+    .btn-pay:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-pay.gratis { background: #27ae60; }
+    .btn-pay.gratis:hover:not(:disabled) { background: #1e8449; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    .btn-pay.loading .spinner { display: block; }
+    .btn-pay.loading .btn-text { display: none; }
+    .notice { font-size: 0.75rem; color: var(--ink-muted); text-align: center; margin-top: 1rem; line-height: 1.5; }
+
+    /* ── SUCCESS ── */
+    .success-screen { display: none; text-align: center; padding: 1rem 0; }
+    .success-screen.show { display: block; }
+    .form-body.hidden { display: none; }
+    .success-icon { width: 72px; height: 72px; background: var(--accent-lt); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 2rem; }
+    .success-screen h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent-dk); margin-bottom: 0.5rem; }
+    .success-screen p { font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6; }
+    .success-detail { background: var(--accent-lt); border-radius: 10px; padding: 1rem; margin-top: 1.25rem; text-align: left; }
+    .success-detail .row { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 4px 0; border-bottom: 0.5px solid rgba(192,57,43,0.15); }
+    .success-detail .row:last-child { border-bottom: none; }
+    .success-detail .row span:first-child { color: var(--ink-muted); }
+    .success-detail .row span:last-child { font-weight: 500; }
+    .error-banner { background: var(--warn-lt); border: 1px solid rgba(181,69,27,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--warn); margin-bottom: 1rem; display: none; }
+    .version { text-align: center; font-size: 0.7rem; color: #aaa; margin-top: 1.5rem; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-emoji">🚒</div>
+  <h1>Brandweerfuif</h1>
+  <p>Inschrijving &amp; hamburgerbestelling</p>
+</div>
+
+<div class="card">
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🎉</div>
+    <h2>Inschrijving bevestigd!</h2>
+    <p>Tot op de fuif! 🔥</p>
+    <div class="success-detail" id="successDetail"></div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-body" id="formBody">
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- Gegevens -->
+    <p class="section-label">Jouw gegevens</p>
+    <div class="field">
+      <label for="naam">Naam</label>
+      <input type="text" id="naam" placeholder="Voornaam Achternaam" autocomplete="name" />
+    </div>
+    <div class="field">
+      <label for="email">E-mailadres</label>
+      <input type="email" id="email" placeholder="naam@voorbeeld.be" autocomplete="email" />
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Aantal personen -->
+    <p class="section-label">Aantal personen</p>
+    <div class="field">
+      <div class="aantal-wrap">
+        <button class="btn-aantal" onclick="aantalPersonen(-1)">−</button>
+        <span class="aantal-getal" id="aantalGetal">1</span>
+        <button class="btn-aantal" onclick="aantalPersonen(1)">+</button>
+        <span style="font-size:0.85rem;color:var(--ink-muted);">personen</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Hamburgers -->
+    <p class="section-label">Hamburgers (optioneel — €5,00/stuk)</p>
+
+    <div class="burger-tijd">
+      <div class="burger-tijd-titel">🕖 Voor 19u00</div>
+      <div class="burger-rij">
+        <span class="burger-naam">🍔 Gewone burger</span>
+        <span class="burger-prijs">€5,00</span>
+        <div class="burger-controls">
+          <button class="btn-burger" onclick="wijzigBurger('voor_gewoon', -1)">−</button>
+          <span class="burger-count" id="voor_gewoon">0</span>
+          <button class="btn-burger" onclick="wijzigBurger('voor_gewoon', 1)">+</button>
+        </div>
+      </div>
+      <div class="burger-rij">
+        <span class="burger-naam">🥗 Vegetarische burger</span>
+        <span class="burger-prijs">€5,00</span>
+        <div class="burger-controls">
+          <button class="btn-burger" onclick="wijzigBurger('voor_vegi', -1)">−</button>
+          <span class="burger-count" id="voor_vegi">0</span>
+          <button class="btn-burger" onclick="wijzigBurger('voor_vegi', 1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="burger-tijd">
+      <div class="burger-tijd-titel">🕘 Na 19u00</div>
+      <div class="burger-rij">
+        <span class="burger-naam">🍔 Gewone burger</span>
+        <span class="burger-prijs">€5,00</span>
+        <div class="burger-controls">
+          <button class="btn-burger" onclick="wijzigBurger('na_gewoon', -1)">−</button>
+          <span class="burger-count" id="na_gewoon">0</span>
+          <button class="btn-burger" onclick="wijzigBurger('na_gewoon', 1)">+</button>
+        </div>
+      </div>
+      <div class="burger-rij">
+        <span class="burger-naam">🥗 Vegetarische burger</span>
+        <span class="burger-prijs">€5,00</span>
+        <div class="burger-controls">
+          <button class="btn-burger" onclick="wijzigBurger('na_vegi', -1)">−</button>
+          <span class="burger-count" id="na_vegi">0</span>
+          <button class="btn-burger" onclick="wijzigBurger('na_vegi', 1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Totaal -->
+    <div class="total-row">
+      <span class="total-label">Totaal</span>
+      <span id="totalAmount" class="total-gratis">Gratis inschrijving</span>
+    </div>
+
+    <!-- Stripe betaalelement -->
+    <div id="payment-element"></div>
+    <div id="card-errors"></div>
+
+    <button class="btn-pay gratis" id="btnPay" disabled>
+      <div class="spinner"></div>
+      <span class="btn-text">Inschrijven</span>
+    </button>
+
+    <p class="notice" id="noticeText">Inschrijving is gratis. Hamburgers worden vooraf betaald via Stripe.</p>
+  </div>
+</div>
+
+<p class="version">v1.0 — Brandweer Oostende</p>
+
+<script>
+// ── CONFIGURATIE ──────────────────────────────────────
+var STRIPE_KEY  = 'pk_live_JOUW_PUBLISHABLE_KEY_HIER';
+var WEBHOOK_URL = 'https://script.google.com/macros/s/JOUW_APPS_SCRIPT_ID/exec';
+var BURGER_PRIJS = 5.00;
+
+// ── REDIRECT AFHANDELING ──────────────────────────────
+var urlParams             = new URLSearchParams(window.location.search);
+var returnedPaymentIntent = urlParams.get('payment_intent');
+var returnedStatus        = urlParams.get('redirect_status');
+
+if (returnedPaymentIntent && returnedStatus === 'succeeded') {
+  var opgeslagen = sessionStorage.getItem('fuif_inschrijving');
+  if (opgeslagen) {
+    var inschrijving = JSON.parse(opgeslagen);
+    sessionStorage.removeItem('fuif_inschrijving');
+    fetch(WEBHOOK_URL, {
+      method: 'POST', headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({
+        actie: 'bevestig_inschrijving',
+        naam: inschrijving.naam, email: inschrijving.email,
+        personen: inschrijving.personen, burgers: inschrijving.burgers,
+        totaal: inschrijving.totaal, paymentId: returnedPaymentIntent
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function() { toonSucces(inschrijving); })
+    .catch(function(err) { console.error('Fout na redirect:', err); });
+  }
+}
+
+// ── STATE ─────────────────────────────────────────────
+var stripe = Stripe(STRIPE_KEY);
+var personen = 1;
+var burgers = { voor_gewoon: 0, voor_vegi: 0, na_gewoon: 0, na_vegi: 0 };
+var betalingKlaar = false;
+var elementsInstance = null;
+var paymentElement = null;
+
+// ── AANTAL PERSONEN ───────────────────────────────────
+function aantalPersonen(delta) {
+  personen = Math.max(1, personen + delta);
+  document.getElementById('aantalGetal').textContent = personen;
+  updateBtn();
+}
+
+// ── BURGERS ───────────────────────────────────────────
+function wijzigBurger(type, delta) {
+  burgers[type] = Math.max(0, burgers[type] + delta);
+  document.getElementById(type).textContent = burgers[type];
+  updateTotaal();
+  updateBtn();
+}
+
+function getTotaalBurgers() {
+  return burgers.voor_gewoon + burgers.voor_vegi + burgers.na_gewoon + burgers.na_vegi;
+}
+
+function getTotaalBedrag() {
+  return getTotaalBurgers() * BURGER_PRIJS;
+}
+
+// ── TOTAAL UI ─────────────────────────────────────────
+function updateTotaal() {
+  var totaal = getTotaalBedrag();
+  var el = document.getElementById('totalAmount');
+  var notice = document.getElementById('noticeText');
+  var btn = document.getElementById('btnPay');
+
+  if (totaal === 0) {
+    el.className = 'total-gratis';
+    el.textContent = 'Gratis inschrijving';
+    notice.textContent = 'Inschrijving is gratis. Hamburgers worden vooraf betaald via Stripe.';
+    btn.className = 'btn-pay gratis';
+    // Reset stripe als het al geladen was
+    if (betalingKlaar) {
+      betalingKlaar = false;
+      elementsInstance = null;
+      paymentElement = null;
+      document.getElementById('payment-element').innerHTML = '';
+      btn.querySelector('.btn-text').textContent = 'Inschrijven';
+    }
+  } else {
+    el.className = 'total-amount';
+    el.textContent = '€ ' + totaal.toFixed(2);
+    notice.textContent = 'Betalingen worden veilig verwerkt via Stripe.';
+    btn.className = 'btn-pay';
+    if (!betalingKlaar) {
+      btn.querySelector('.btn-text').textContent = 'Betalen & Inschrijven';
+    }
+  }
+}
+
+// ── VALIDATIE ─────────────────────────────────────────
+function updateBtn() {
+  var naam  = document.getElementById('naam').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var ok = naam.length > 1 && email.includes('@') && email.includes('.');
+  document.getElementById('btnPay').disabled = !ok;
+}
+
+document.getElementById('naam').addEventListener('input', updateBtn);
+document.getElementById('email').addEventListener('input', updateBtn);
+
+// ── HULPFUNCTIES ──────────────────────────────────────
+function toonFout(msg) {
+  var el = document.getElementById('errorBanner');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function toonSucces(data) {
+  document.getElementById('formBody').classList.add('hidden');
+  var sc = document.getElementById('successScreen');
+  sc.classList.add('show');
+
+  var totaal = data.totaal || 0;
+  var b = data.burgers || {};
+  var html = '';
+  html += '<div class="row"><span>Naam</span><span>' + data.naam + '</span></div>';
+  html += '<div class="row"><span>Aantal personen</span><span>' + data.personen + '</span></div>';
+  if ((b.voor_gewoon || 0) > 0) html += '<div class="row"><span>Burger voor 19u (gewoon)</span><span>' + b.voor_gewoon + 'x</span></div>';
+  if ((b.voor_vegi   || 0) > 0) html += '<div class="row"><span>Burger voor 19u (vegi)</span><span>'   + b.voor_vegi   + 'x</span></div>';
+  if ((b.na_gewoon   || 0) > 0) html += '<div class="row"><span>Burger na 19u (gewoon)</span><span>'   + b.na_gewoon   + 'x</span></div>';
+  if ((b.na_vegi     || 0) > 0) html += '<div class="row"><span>Burger na 19u (vegi)</span><span>'     + b.na_vegi     + 'x</span></div>';
+  if (totaal > 0) {
+    html += '<div class="row"><span>Betaald</span><span>€ ' + (totaal / 100).toFixed(2) + '</span></div>';
+  } else {
+    html += '<div class="row"><span>Betaald</span><span>Gratis</span></div>';
+  }
+  document.getElementById('successDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── BETAALKNOP ────────────────────────────────────────
+document.getElementById('btnPay').addEventListener('click', function() {
+  var naam  = document.getElementById('naam').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var totaal = Math.round(getTotaalBedrag() * 100);
+  var btn = document.getElementById('btnPay');
+
+  toonFout('');
+
+  // GRATIS INSCHRIJVING
+  if (totaal === 0) {
+    btn.classList.add('loading'); btn.disabled = true;
+    fetch(WEBHOOK_URL, {
+      method: 'POST', headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({
+        actie: 'gratis_inschrijving',
+        naam: naam, email: email,
+        personen: personen, burgers: burgers
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function() {
+      toonSucces({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: 0 });
+    })
+    .catch(function(err) {
+      toonFout('Er ging iets mis. Probeer opnieuw.');
+      btn.classList.remove('loading'); btn.disabled = false;
+    });
+    return;
+  }
+
+  // MET BETALING — tweede klik bevestigt
+  if (betalingKlaar) {
+    btn.classList.add('loading'); btn.disabled = true;
+    stripe.confirmPayment({
+      elements: elementsInstance,
+      confirmParams: {
+        return_url: window.location.href.split('?')[0],
+        payment_method_data: { billing_details: { name: naam, email: email } }
+      },
+      redirect: 'if_required'
+    }).then(function(result) {
+      if (result.error) {
+        toonFout(result.error.message);
+        btn.classList.remove('loading'); btn.disabled = false;
+        return;
+      }
+      fetch(WEBHOOK_URL, {
+        method: 'POST', headers: {'Content-Type': 'text/plain'},
+        body: JSON.stringify({
+          actie: 'bevestig_inschrijving',
+          naam: naam, email: email,
+          personen: personen, burgers: burgers,
+          totaal: totaal, paymentId: result.paymentIntent.id
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function() { toonSucces({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal }); })
+      .catch(function() { toonSucces({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal }); });
+    });
+    return;
+  }
+
+  // EERSTE KLIK MET BETALING — laad Stripe
+  btn.classList.add('loading'); btn.disabled = true;
+
+  sessionStorage.setItem('fuif_inschrijving', JSON.stringify({
+    naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal
+  }));
+
+  fetch(WEBHOOK_URL, {
+    method: 'POST', headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify({
+      actie: 'create_payment_intent',
+      naam: naam, email: email, totaal: totaal,
+      burgers: burgers
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.clientSecret) throw new Error(data.error || 'Geen client secret ontvangen.');
+
+    elementsInstance = stripe.elements({
+      clientSecret: data.clientSecret,
+      appearance: {
+        theme: 'stripe',
+        variables: { colorPrimary: '#C0392B', fontFamily: 'DM Sans, sans-serif', borderRadius: '8px' }
+      }
+    });
+
+    paymentElement = elementsInstance.create('payment', {
+      layout: 'tabs',
+      defaultValues: { billingDetails: { name: naam, email: email } }
+    });
+    paymentElement.mount('#payment-element');
+
+    betalingKlaar = true;
+    btn.classList.remove('loading'); btn.disabled = false;
+    btn.querySelector('.btn-text').textContent = 'Bevestig betaling';
+  })
+  .catch(function(err) {
+    toonFout(err.message || 'Er ging iets mis. Probeer opnieuw.');
+    btn.classList.remove('loading'); btn.disabled = false;
+  });
+});
+
+// ── START ─────────────────────────────────────────────
+updateBtn();
+</script>
+</body>
+</html>
