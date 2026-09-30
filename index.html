@@ -4,204 +4,474 @@
   <meta charset="UTF-8" />
   <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fin de saison — Inschrijving</title>
+  <title>Fin de saison</title>
   <script src="https://js.stripe.com/v3/"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg:        #F7F4EE;
+      --night:     #0D1421;
+      --night-mid: #172035;
+      --gold:      #C9973A;
+      --gold-lt:   #F0DEB4;
+      --gold-dk:   #8B6420;
+      --chalk:     #F8F4ED;
+      --chalk-dim: #B8B0A2;
       --surface:   #FFFFFF;
-      --ink:       #1A1A18;
-      --ink-muted: #6B6A65;
-      --accent:    #C0392B;
-      --accent-lt: #FADBD8;
-      --accent-dk: #922B21;
-      --warn:      #B5451B;
+      --warn:      #C0392B;
       --warn-lt:   #FAECE7;
-      --border:    rgba(26,26,24,0.12);
-      --radius:    14px;
-      --shadow:    0 2px 16px rgba(0,0,0,0.07);
+      --border:    rgba(201,151,58,0.22);
+      --radius:    10px;
     }
-    html { background: var(--bg); }
-    body { font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; overflow-x: hidden; }
 
-    /* ── HEADER ── */
-    .header { text-align: center; margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
-    .header-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
-    .header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 6vw, 2.8rem); color: var(--accent-dk); line-height: 1.1; margin-bottom: 0.4rem; }
-    .header p { font-size: 0.95rem; color: var(--ink-muted); }
+    html, body { background: var(--night); }
 
-    /* ── CARD ── */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; width: 100%; max-width: 500px; animation: fadeUp 0.5s 0.1s ease both; position: relative; z-index: 1; }
-    .section-label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.75rem; }
-    .field { margin-bottom: 1.25rem; }
-    label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; }
-    input[type="text"], input[type="email"] { width: 100%; padding: 0.65rem 0.9rem; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--bg); outline: none; transition: border-color 0.15s; }
-    input:focus { border-color: var(--accent); background: #fff; }
-    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--chalk);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      width: 100%;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,151,58,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 12vw, 7rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 0.95;
+      color: var(--chalk);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      font-size: 0.875rem;
+      color: var(--chalk-dim);
+      max-width: 340px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .hero-lijn {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 1.5rem auto;
+      opacity: 0.6;
+    }
+
+    /* ── FORMULIER CONTAINER ── */
+    .form-wrap {
+      width: 100%;
+      max-width: 520px;
+      padding: 0 1rem 5rem;
+    }
+
+    /* ── SECTIE ── */
+    .sectie {
+      margin-bottom: 2rem;
+    }
+
+    .sectie-titel {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--chalk);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── VELDEN ── */
+    .field { margin-bottom: 1rem; }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--chalk-dim);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.03em;
+    }
+
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(248,244,237,0.12);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--chalk);
+      background: var(--night-mid);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder { color: rgba(184,176,162,0.5); }
+
+    input:focus { border-color: var(--gold); }
 
     /* ── AANTAL PERSONEN ── */
-    .aantal-wrap { display: flex; align-items: center; gap: 12px; }
-    .btn-aantal { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: inherit; }
-    .btn-aantal:hover { background: var(--accent-lt); border-color: var(--accent); }
-    .aantal-getal { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent-dk); min-width: 32px; text-align: center; }
+    .aantal-wrap { display: flex; align-items: center; gap: 14px; }
 
-    /* ── BURGER SECTIE ── */
-    .burger-tijd { background: var(--bg); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border); }
-    .burger-tijd-titel { font-size: 0.85rem; font-weight: 500; color: var(--ink); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
-    .burger-rij { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
-    .burger-rij:not(:last-child) { border-bottom: 0.5px solid var(--border); }
-    .burger-naam { font-size: 0.875rem; color: var(--ink); flex: 1; }
-    .burger-prijs { font-size: 0.8rem; color: var(--ink-muted); margin-right: 12px; }
-    .burger-controls { display: flex; align-items: center; gap: 8px; }
-    .btn-burger { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: inherit; }
-    .btn-burger:hover { background: var(--accent-lt); border-color: var(--accent); }
-    .burger-count { font-size: 0.9rem; font-weight: 500; min-width: 20px; text-align: center; }
+    .btn-aantal {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--night-mid);
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .btn-aantal:hover { background: rgba(201,151,58,0.15); border-color: var(--gold); }
+
+    .aantal-getal {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--gold);
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .aantal-label { font-size: 0.8rem; color: var(--chalk-dim); }
+
+    /* ── BURGER BLOK ── */
+    .burger-blok {
+      background: var(--night-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .burger-blok-header {
+      padding: 0.65rem 1rem;
+      background: rgba(201,151,58,0.08);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+    }
+
+    .burger-rij {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      gap: 10px;
+    }
+    .burger-rij + .burger-rij { border-top: 1px solid rgba(248,244,237,0.06); }
+
+    .burger-naam { flex: 1; font-size: 0.875rem; color: var(--chalk); }
+    .burger-prijs { font-size: 0.78rem; color: var(--chalk-dim); margin-right: 6px; }
+
+    .burger-controls { display: flex; align-items: center; gap: 10px; }
+
+    .btn-burger {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,151,58,0.3);
+      background: transparent;
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .btn-burger:hover { background: rgba(201,151,58,0.15); }
+
+    .burger-count {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--chalk);
+      min-width: 18px;
+      text-align: center;
+    }
 
     /* ── TOTAAL ── */
-    .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
-    .total-label { font-size: 0.9rem; color: var(--ink-muted); }
-    .total-amount { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent-dk); }
-    .total-gratis { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #27ae60; }
+    .totaal-rij {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
 
-    /* ── BETAALKNOP ── */
+    .totaal-label { font-size: 0.8rem; color: var(--chalk-dim); }
+
+    .totaal-bedrag {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .totaal-gratis {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--chalk-dim);
+    }
+
+    /* ── BETAALELEMENT ── */
     #payment-element { margin-bottom: 1.25rem; }
-    #card-errors { color: var(--warn); font-size: 0.8rem; margin-top: 0.4rem; min-height: 1.2em; }
-    .btn-pay { width: 100%; padding: 0.9rem; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-pay:hover:not(:disabled) { background: var(--accent-dk); }
-    .btn-pay:active:not(:disabled) { transform: scale(0.98); }
-    .btn-pay:disabled { opacity: 0.55; cursor: not-allowed; }
-    .btn-pay.gratis { background: #27ae60; }
-    .btn-pay.gratis:hover:not(:disabled) { background: #1e8449; }
-    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    #card-errors { color: var(--warn); font-size: 0.8rem; margin-top: 0.4rem; min-height: 1em; }
+
+    /* ── KNOP ── */
+    .btn-pay {
+      width: 100%;
+      padding: 1rem;
+      background: var(--gold);
+      color: var(--night);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-pay:hover:not(:disabled) { background: #D4A84A; }
+    .btn-pay:active:not(:disabled) { transform: scale(0.99); }
+    .btn-pay:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-pay.gratis { background: transparent; color: var(--chalk-dim); border: 1px solid rgba(248,244,237,0.2); }
+    .btn-pay.gratis:hover:not(:disabled) { border-color: var(--chalk-dim); color: var(--chalk); }
+
+    .spinner {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(13,20,33,0.3);
+      border-top-color: var(--night);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
     .btn-pay.loading .spinner { display: block; }
     .btn-pay.loading .btn-text { display: none; }
-    .notice { font-size: 0.75rem; color: var(--ink-muted); text-align: center; margin-top: 1rem; line-height: 1.5; }
+
+    .notice {
+      font-size: 0.72rem;
+      color: var(--chalk-dim);
+      text-align: center;
+      margin-top: 0.875rem;
+      line-height: 1.6;
+      opacity: 0.7;
+    }
+
+    /* ── ERROR ── */
+    .error-banner {
+      background: rgba(192,57,43,0.12);
+      border: 1px solid rgba(192,57,43,0.3);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: #E8785A;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
 
     /* ── SUCCESS ── */
-    .success-screen { display: none; text-align: center; padding: 1rem 0; }
+    .success-screen { display: none; }
     .success-screen.show { display: block; }
     .form-body.hidden { display: none; }
-    .success-icon { width: 72px; height: 72px; background: var(--accent-lt); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 2rem; }
-    .success-screen h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent-dk); margin-bottom: 0.5rem; }
-    .success-screen p { font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6; }
-    .success-detail { background: var(--accent-lt); border-radius: 10px; padding: 1rem; margin-top: 1.25rem; text-align: left; }
-    .success-detail .row { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 4px 0; border-bottom: 0.5px solid rgba(192,57,43,0.15); }
-    .success-detail .row:last-child { border-bottom: none; }
-    .success-detail .row span:first-child { color: var(--ink-muted); }
-    .success-detail .row span:last-child { font-weight: 500; }
-    .error-banner { background: var(--warn-lt); border: 1px solid rgba(181,69,27,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--warn); margin-bottom: 1rem; display: none; }
-    .version { text-align: center; font-size: 0.7rem; color: #aaa; margin-top: 1.5rem; }
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .success-hero {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+    }
+
+    .success-groot {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .success-sub {
+      font-size: 0.875rem;
+      color: var(--chalk-dim);
+      margin-bottom: 2rem;
+    }
+
+    .success-kaart {
+      background: var(--night-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .success-rij {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+    .success-rij + .success-rij { border-top: 1px solid rgba(248,244,237,0.06); }
+    .success-rij span:first-child { color: var(--chalk-dim); }
+    .success-rij span:last-child { color: var(--chalk); font-weight: 500; }
+    .success-rij.totaal span { color: var(--gold); }
+
+    /* ── VERSIE ── */
+    .version {
+      font-size: 0.65rem;
+      color: rgba(184,176,162,0.3);
+      padding: 1rem 0 2rem;
+      letter-spacing: 0.05em;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-emoji"></div>
-  <h1>Fin de saison</h1>
-  <p>Inschrijving &amp; hamburgerbestelling</p>
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-label">Brandweer Oostende</p>
+  <h1>Fin de<br><em>saison</em></h1>
+  <div class="hero-lijn"></div>
+  <p class="hero-sub">Schrijf je in voor de fuif en bestel alvast je hamburger.</p>
 </div>
 
-<div class="card">
+<!-- FORM WRAP -->
+<div class="form-wrap">
 
-  <!-- SUCCESS SCREEN -->
+  <!-- SUCCESS -->
   <div class="success-screen" id="successScreen">
-    <div class="success-icon">🎉</div>
-    <h2>Inschrijving bevestigd!</h2>
-    <p>See you there! 🔥</p>
-    <div class="success-detail" id="successDetail"></div>
+    <div class="success-hero">
+      <div class="success-groot">Tot vanavond.</div>
+      <p class="success-sub">Inschrijving bevestigd — tot op de fuif! 🔥</p>
+    </div>
+    <div class="success-kaart" id="successDetail"></div>
   </div>
 
   <!-- FORM -->
   <div class="form-body" id="formBody">
     <div class="error-banner" id="errorBanner"></div>
 
-    <!-- Gegevens -->
-    <p class="section-label">Jouw gegevens</p>
-    <div class="field">
-      <label for="naam">Naam</label>
-      <input type="text" id="naam" placeholder="Voornaam Achternaam" autocomplete="name" />
-    </div>
-    <div class="field">
-      <label for="email">E-mailadres</label>
-      <input type="email" id="email" placeholder="naam@voorbeeld.be" autocomplete="email" />
+    <div class="sectie">
+      <div class="sectie-titel">Jouw gegevens</div>
+      <div class="field">
+        <label for="naam">Naam</label>
+        <input type="text" id="naam" placeholder="Voornaam Achternaam" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="email">E-mailadres</label>
+        <input type="email" id="email" placeholder="naam@voorbeeld.be" autocomplete="email" />
+      </div>
     </div>
 
-    <div class="divider"></div>
-
-    <!-- Aantal personen -->
-    <p class="section-label">Aantal personen</p>
-    <div class="field">
+    <div class="sectie">
+      <div class="sectie-titel">Hoeveel personen?</div>
       <div class="aantal-wrap">
         <button class="btn-aantal" onclick="aantalPersonen(-1)">−</button>
         <span class="aantal-getal" id="aantalGetal">1</span>
         <button class="btn-aantal" onclick="aantalPersonen(1)">+</button>
-        <span style="font-size:0.85rem;color:var(--ink-muted);">personen</span>
+        <span class="aantal-label">personen</span>
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="sectie">
+      <div class="sectie-titel">Hamburgers <span style="font-weight:400;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--chalk-dim);">optioneel — €5 / stuk</span></div>
 
-    <!-- Hamburgers -->
-    <p class="section-label">Hamburgers (optioneel — €5,00/stuk)</p>
-
-    <div class="burger-tijd">
-      <div class="burger-tijd-titel">🕖 Voor 19u00</div>
-      <div class="burger-rij">
-        <span class="burger-naam">🍔 Gewone burger</span>
-        <span class="burger-prijs">€5,00</span>
-        <div class="burger-controls">
-          <button class="btn-burger" onclick="wijzigBurger('voor_gewoon', -1)">−</button>
-          <span class="burger-count" id="voor_gewoon">0</span>
-          <button class="btn-burger" onclick="wijzigBurger('voor_gewoon', 1)">+</button>
+      <div class="burger-blok">
+        <div class="burger-blok-header">Voor 19u00</div>
+        <div class="burger-rij">
+          <span class="burger-naam">Gewone burger</span>
+          <span class="burger-prijs">€5,00</span>
+          <div class="burger-controls">
+            <button class="btn-burger" onclick="wijzigBurger('voor_gewoon', -1)">−</button>
+            <span class="burger-count" id="voor_gewoon">0</span>
+            <button class="btn-burger" onclick="wijzigBurger('voor_gewoon', 1)">+</button>
+          </div>
+        </div>
+        <div class="burger-rij">
+          <span class="burger-naam">Vegetarische burger</span>
+          <span class="burger-prijs">€5,00</span>
+          <div class="burger-controls">
+            <button class="btn-burger" onclick="wijzigBurger('voor_vegi', -1)">−</button>
+            <span class="burger-count" id="voor_vegi">0</span>
+            <button class="btn-burger" onclick="wijzigBurger('voor_vegi', 1)">+</button>
+          </div>
         </div>
       </div>
-      <div class="burger-rij">
-        <span class="burger-naam">🥗 Vegetarische burger</span>
-        <span class="burger-prijs">€5,00</span>
-        <div class="burger-controls">
-          <button class="btn-burger" onclick="wijzigBurger('voor_vegi', -1)">−</button>
-          <span class="burger-count" id="voor_vegi">0</span>
-          <button class="btn-burger" onclick="wijzigBurger('voor_vegi', 1)">+</button>
+
+      <div class="burger-blok">
+        <div class="burger-blok-header">Na 19u00</div>
+        <div class="burger-rij">
+          <span class="burger-naam">Gewone burger</span>
+          <span class="burger-prijs">€5,00</span>
+          <div class="burger-controls">
+            <button class="btn-burger" onclick="wijzigBurger('na_gewoon', -1)">−</button>
+            <span class="burger-count" id="na_gewoon">0</span>
+            <button class="btn-burger" onclick="wijzigBurger('na_gewoon', 1)">+</button>
+          </div>
+        </div>
+        <div class="burger-rij">
+          <span class="burger-naam">Vegetarische burger</span>
+          <span class="burger-prijs">€5,00</span>
+          <div class="burger-controls">
+            <button class="btn-burger" onclick="wijzigBurger('na_vegi', -1)">−</button>
+            <span class="burger-count" id="na_vegi">0</span>
+            <button class="btn-burger" onclick="wijzigBurger('na_vegi', 1)">+</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="burger-tijd">
-      <div class="burger-tijd-titel">🕘 Na 19u00</div>
-      <div class="burger-rij">
-        <span class="burger-naam">🍔 Gewone burger</span>
-        <span class="burger-prijs">€5,00</span>
-        <div class="burger-controls">
-          <button class="btn-burger" onclick="wijzigBurger('na_gewoon', -1)">−</button>
-          <span class="burger-count" id="na_gewoon">0</span>
-          <button class="btn-burger" onclick="wijzigBurger('na_gewoon', 1)">+</button>
-        </div>
-      </div>
-      <div class="burger-rij">
-        <span class="burger-naam">🥗 Vegetarische burger</span>
-        <span class="burger-prijs">€5,00</span>
-        <div class="burger-controls">
-          <button class="btn-burger" onclick="wijzigBurger('na_vegi', -1)">−</button>
-          <span class="burger-count" id="na_vegi">0</span>
-          <button class="btn-burger" onclick="wijzigBurger('na_vegi', 1)">+</button>
-        </div>
-      </div>
+    <!-- TOTAAL -->
+    <div class="totaal-rij">
+      <span class="totaal-label">Totaal te betalen</span>
+      <span id="totalAmount" class="totaal-gratis">Gratis</span>
     </div>
 
-    <div class="divider"></div>
-
-    <!-- Totaal -->
-    <div class="total-row">
-      <span class="total-label">Totaal</span>
-      <span id="totalAmount" class="total-gratis">Gratis inschrijving</span>
-    </div>
-
-    <!-- Stripe betaalelement -->
     <div id="payment-element"></div>
     <div id="card-errors"></div>
 
@@ -210,19 +480,19 @@
       <span class="btn-text">Inschrijven</span>
     </button>
 
-    <p class="notice" id="noticeText">Inschrijving is gratis. Hamburgers worden vooraf betaald via Stripe.</p>
+    <p class="notice" id="noticeText">Inschrijving is gratis — hamburgers worden vooraf betaald via Stripe.</p>
   </div>
+
 </div>
 
-<p class="version">v1.11 — Louis Biebuyck</p>
+<p class="version">v2.0 — Louis Biebuyck</p>
 
 <script>
-// ── CONFIGURATIE ──────────────────────────────────────
-var STRIPE_KEY  = 'pk_live_51TdGeEKkHhYoBtH5DUQv5XlEcD1V6O9RX8ggJQdWO6DXWAyhBkOGpUIdsjxIob82BIGNtjHlS7XFTaXlUUoIa0h000T06T5fR5';
-var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx3jWrALfrTQPSv4RiF29FDN_xMxPOBQRDkQh4Huq9KSeTcBslUHdug3WesZS8mQyr9/exec';
+var STRIPE_KEY   = 'pk_live_51TdGeEKkHhYoBtH5DUQv5XlEcD1V6O9RX8ggJQdWO6DXWAyhBkOGpUIdsjxIob82BIGNtjHlS7XFTaXlUUoIa0h000T06T5fR5';
+var WEBHOOK_URL  = 'https://script.google.com/macros/s/AKfycbx3jWrALfrTQPSv4RiF29FDN_xMxPOBQRDkQh4Huq9KSeTcBslUHdug3WesZS8mQyr9/exec';
 var BURGER_PRIJS = 5.00;
 
-// ── REDIRECT AFHANDELING ──────────────────────────────
+// ── REDIRECT ──────────────────────────────────────────
 var urlParams             = new URLSearchParams(window.location.search);
 var returnedPaymentIntent = urlParams.get('payment_intent');
 var returnedStatus        = urlParams.get('redirect_status');
@@ -255,14 +525,12 @@ var betalingKlaar = false;
 var elementsInstance = null;
 var paymentElement = null;
 
-// ── AANTAL PERSONEN ───────────────────────────────────
 function aantalPersonen(delta) {
   personen = Math.max(1, personen + delta);
   document.getElementById('aantalGetal').textContent = personen;
   updateBtn();
 }
 
-// ── BURGERS ───────────────────────────────────────────
 function wijzigBurger(type, delta) {
   burgers[type] = Math.max(0, burgers[type] + delta);
   document.getElementById(type).textContent = burgers[type];
@@ -278,49 +546,40 @@ function getTotaalBedrag() {
   return getTotaalBurgers() * BURGER_PRIJS;
 }
 
-// ── TOTAAL UI ─────────────────────────────────────────
 function updateTotaal() {
   var totaal = getTotaalBedrag();
-  var el = document.getElementById('totalAmount');
+  var el     = document.getElementById('totalAmount');
   var notice = document.getElementById('noticeText');
-  var btn = document.getElementById('btnPay');
+  var btn    = document.getElementById('btnPay');
 
   if (totaal === 0) {
-    el.className = 'total-gratis';
-    el.textContent = 'Gratis inschrijving';
-    notice.textContent = 'Inschrijving is gratis. Hamburgers worden vooraf betaald via Stripe.';
-    btn.className = 'btn-pay gratis';
-    // Reset stripe als het al geladen was
+    el.className   = 'totaal-gratis';
+    el.textContent = 'Gratis';
+    notice.textContent = 'Inschrijving is gratis — hamburgers worden vooraf betaald via Stripe.';
+    btn.className  = 'btn-pay gratis';
     if (betalingKlaar) {
-      betalingKlaar = false;
-      elementsInstance = null;
-      paymentElement = null;
+      betalingKlaar = false; elementsInstance = null; paymentElement = null;
       document.getElementById('payment-element').innerHTML = '';
       btn.querySelector('.btn-text').textContent = 'Inschrijven';
     }
   } else {
-    el.className = 'total-amount';
+    el.className   = 'totaal-bedrag';
     el.textContent = '€ ' + totaal.toFixed(2);
     notice.textContent = 'Betalingen worden veilig verwerkt via Stripe.';
-    btn.className = 'btn-pay';
-    if (!betalingKlaar) {
-      btn.querySelector('.btn-text').textContent = 'Betalen & Inschrijven';
-    }
+    btn.className  = 'btn-pay';
+    if (!betalingKlaar) btn.querySelector('.btn-text').textContent = 'Betalen & Inschrijven';
   }
 }
 
-// ── VALIDATIE ─────────────────────────────────────────
 function updateBtn() {
   var naam  = document.getElementById('naam').value.trim();
   var email = document.getElementById('email').value.trim();
-  var ok = naam.length > 1 && email.includes('@') && email.includes('.');
-  document.getElementById('btnPay').disabled = !ok;
+  document.getElementById('btnPay').disabled = !(naam.length > 1 && email.includes('@') && email.includes('.'));
 }
 
 document.getElementById('naam').addEventListener('input', updateBtn);
 document.getElementById('email').addEventListener('input', updateBtn);
 
-// ── HULPFUNCTIES ──────────────────────────────────────
 function toonFout(msg) {
   var el = document.getElementById('errorBanner');
   el.textContent = msg;
@@ -329,59 +588,40 @@ function toonFout(msg) {
 
 function toonSucces(data) {
   document.getElementById('formBody').classList.add('hidden');
-  var sc = document.getElementById('successScreen');
-  sc.classList.add('show');
-
+  document.getElementById('successScreen').classList.add('show');
   var totaal = data.totaal || 0;
   var b = data.burgers || {};
   var html = '';
-  html += '<div class="row"><span>Naam</span><span>' + data.naam + '</span></div>';
-  html += '<div class="row"><span>Aantal personen</span><span>' + data.personen + '</span></div>';
-  if ((b.voor_gewoon || 0) > 0) html += '<div class="row"><span>Burger voor 19u (gewoon)</span><span>' + b.voor_gewoon + 'x</span></div>';
-  if ((b.voor_vegi   || 0) > 0) html += '<div class="row"><span>Burger voor 19u (vegi)</span><span>'   + b.voor_vegi   + 'x</span></div>';
-  if ((b.na_gewoon   || 0) > 0) html += '<div class="row"><span>Burger na 19u (gewoon)</span><span>'   + b.na_gewoon   + 'x</span></div>';
-  if ((b.na_vegi     || 0) > 0) html += '<div class="row"><span>Burger na 19u (vegi)</span><span>'     + b.na_vegi     + 'x</span></div>';
-  if (totaal > 0) {
-    html += '<div class="row"><span>Betaald</span><span>€ ' + (totaal / 100).toFixed(2) + '</span></div>';
-  } else {
-    html += '<div class="row"><span>Betaald</span><span>Gratis</span></div>';
-  }
+  html += '<div class="success-rij"><span>Naam</span><span>' + data.naam + '</span></div>';
+  html += '<div class="success-rij"><span>Personen</span><span>' + data.personen + '</span></div>';
+  if ((b.voor_gewoon || 0) > 0) html += '<div class="success-rij"><span>Burger voor 19u — gewoon</span><span>' + b.voor_gewoon + 'x</span></div>';
+  if ((b.voor_vegi   || 0) > 0) html += '<div class="success-rij"><span>Burger voor 19u — vegi</span><span>'   + b.voor_vegi   + 'x</span></div>';
+  if ((b.na_gewoon   || 0) > 0) html += '<div class="success-rij"><span>Burger na 19u — gewoon</span><span>'   + b.na_gewoon   + 'x</span></div>';
+  if ((b.na_vegi     || 0) > 0) html += '<div class="success-rij"><span>Burger na 19u — vegi</span><span>'     + b.na_vegi     + 'x</span></div>';
+  html += '<div class="success-rij totaal"><span>Betaald</span><span>' + (totaal > 0 ? '€ ' + (totaal/100).toFixed(2) : 'Gratis') + '</span></div>';
   document.getElementById('successDetail').innerHTML = html;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── BETAALKNOP ────────────────────────────────────────
 document.getElementById('btnPay').addEventListener('click', function() {
-  var naam  = document.getElementById('naam').value.trim();
-  var email = document.getElementById('email').value.trim();
+  var naam   = document.getElementById('naam').value.trim();
+  var email  = document.getElementById('email').value.trim();
   var totaal = Math.round(getTotaalBedrag() * 100);
-  var btn = document.getElementById('btnPay');
-
+  var btn    = document.getElementById('btnPay');
   toonFout('');
 
-  // GRATIS INSCHRIJVING
   if (totaal === 0) {
     btn.classList.add('loading'); btn.disabled = true;
     fetch(WEBHOOK_URL, {
       method: 'POST', headers: {'Content-Type': 'text/plain'},
-      body: JSON.stringify({
-        actie: 'gratis_inschrijving',
-        naam: naam, email: email,
-        personen: personen, burgers: burgers
-      })
+      body: JSON.stringify({ actie: 'gratis_inschrijving', naam: naam, email: email, personen: personen, burgers: burgers })
     })
     .then(function(r) { return r.json(); })
-    .then(function() {
-      toonSucces({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: 0 });
-    })
-    .catch(function(err) {
-      toonFout('Er ging iets mis. Probeer opnieuw.');
-      btn.classList.remove('loading'); btn.disabled = false;
-    });
+    .then(function() { toonSucces({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: 0 }); })
+    .catch(function() { toonFout('Er ging iets mis. Probeer opnieuw.'); btn.classList.remove('loading'); btn.disabled = false; });
     return;
   }
 
-  // MET BETALING — tweede klik bevestigt
   if (betalingKlaar) {
     btn.classList.add('loading'); btn.disabled = true;
     stripe.confirmPayment({
@@ -392,19 +632,10 @@ document.getElementById('btnPay').addEventListener('click', function() {
       },
       redirect: 'if_required'
     }).then(function(result) {
-      if (result.error) {
-        toonFout(result.error.message);
-        btn.classList.remove('loading'); btn.disabled = false;
-        return;
-      }
+      if (result.error) { toonFout(result.error.message); btn.classList.remove('loading'); btn.disabled = false; return; }
       fetch(WEBHOOK_URL, {
         method: 'POST', headers: {'Content-Type': 'text/plain'},
-        body: JSON.stringify({
-          actie: 'bevestig_inschrijving',
-          naam: naam, email: email,
-          personen: personen, burgers: burgers,
-          totaal: totaal, paymentId: result.paymentIntent.id
-        })
+        body: JSON.stringify({ actie: 'bevestig_inschrijving', naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal, paymentId: result.paymentIntent.id })
       })
       .then(function(r) { return r.json(); })
       .then(function() { toonSucces({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal }); })
@@ -413,50 +644,29 @@ document.getElementById('btnPay').addEventListener('click', function() {
     return;
   }
 
-  // EERSTE KLIK MET BETALING — laad Stripe
   btn.classList.add('loading'); btn.disabled = true;
-
-  sessionStorage.setItem('fuif_inschrijving', JSON.stringify({
-    naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal
-  }));
+  sessionStorage.setItem('fuif_inschrijving', JSON.stringify({ naam: naam, email: email, personen: personen, burgers: burgers, totaal: totaal }));
 
   fetch(WEBHOOK_URL, {
     method: 'POST', headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify({
-      actie: 'create_payment_intent',
-      naam: naam, email: email, totaal: totaal,
-      burgers: burgers
-    })
+    body: JSON.stringify({ actie: 'create_payment_intent', naam: naam, email: email, totaal: totaal, burgers: burgers })
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
     if (!data.clientSecret) throw new Error(data.error || 'Geen client secret ontvangen.');
-
     elementsInstance = stripe.elements({
       clientSecret: data.clientSecret,
-      appearance: {
-        theme: 'stripe',
-        variables: { colorPrimary: '#C0392B', fontFamily: 'DM Sans, sans-serif', borderRadius: '8px' }
-      }
+      appearance: { theme: 'night', variables: { colorPrimary: '#C9973A', fontFamily: 'Inter, sans-serif', borderRadius: '10px' } }
     });
-
-    paymentElement = elementsInstance.create('payment', {
-      layout: 'tabs',
-      defaultValues: { billingDetails: { name: naam, email: email } }
-    });
+    paymentElement = elementsInstance.create('payment', { layout: 'tabs', defaultValues: { billingDetails: { name: naam, email: email } } });
     paymentElement.mount('#payment-element');
-
     betalingKlaar = true;
     btn.classList.remove('loading'); btn.disabled = false;
     btn.querySelector('.btn-text').textContent = 'Bevestig betaling';
   })
-  .catch(function(err) {
-    toonFout(err.message || 'Er ging iets mis. Probeer opnieuw.');
-    btn.classList.remove('loading'); btn.disabled = false;
-  });
+  .catch(function(err) { toonFout(err.message || 'Er ging iets mis.'); btn.classList.remove('loading'); btn.disabled = false; });
 });
 
-// ── START ─────────────────────────────────────────────
 updateBtn();
 </script>
 </body>
