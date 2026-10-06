@@ -498,22 +498,75 @@ var returnedPaymentIntent = urlParams.get('payment_intent');
 var returnedStatus        = urlParams.get('redirect_status');
 
 if (returnedPaymentIntent && returnedStatus === 'succeeded') {
+
   var opgeslagen = sessionStorage.getItem('fuif_inschrijving');
+
   if (opgeslagen) {
+
     var inschrijving = JSON.parse(opgeslagen);
-    sessionStorage.removeItem('fuif_inschrijving');
+
+    console.log('Stripe betaling geslaagd:', returnedPaymentIntent);
+    console.log('Inschrijving wordt doorgestuurd naar Apps Script...');
+
     fetch(WEBHOOK_URL, {
-      method: 'POST', headers: {'Content-Type': 'text/plain'},
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain'
+      },
       body: JSON.stringify({
         actie: 'bevestig_inschrijving',
-        naam: inschrijving.naam, email: inschrijving.email,
-        personen: inschrijving.personen, burgers: inschrijving.burgers,
-        totaal: inschrijving.totaal, paymentId: returnedPaymentIntent
+        naam: inschrijving.naam,
+        email: inschrijving.email,
+        personen: inschrijving.personen,
+        burgers: inschrijving.burgers,
+        totaal: inschrijving.totaal,
+        paymentId: returnedPaymentIntent
       })
     })
-    .then(function(r) { return r.json(); })
-    .then(function() { toonSucces(inschrijving); })
-    .catch(function(err) { console.error('Fout na redirect:', err); });
+
+    .then(function(r) {
+
+      console.log('Antwoord van Apps Script:', r.status);
+
+      if (!r.ok) {
+        throw new Error('Apps Script gaf HTTP-fout: ' + r.status);
+      }
+
+      return r.json();
+    })
+
+    .then(function(result) {
+
+      console.log('Resultaat Apps Script:', result);
+
+      if (!result || result.ok !== true) {
+        throw new Error(
+          'Inschrijving werd niet bevestigd: ' +
+          JSON.stringify(result)
+        );
+      }
+
+      // PAS NU verwijderen we de opgeslagen inschrijving.
+      sessionStorage.removeItem('fuif_inschrijving');
+
+      console.log('Inschrijving succesvol opgeslagen.');
+
+      toonSucces(inschrijving);
+    })
+
+    .catch(function(err) {
+
+      console.error('Fout na redirect:', err);
+
+      // BELANGRIJK:
+      // sessionStorage blijft behouden zodat we opnieuw kunnen proberen.
+    });
+  }
+
+  else {
+    console.error(
+      'Stripe betaling is geslaagd, maar fuif_inschrijving ontbreekt in sessionStorage.'
+    );
   }
 }
 
